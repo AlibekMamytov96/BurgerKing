@@ -37,8 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # my libs
+    'cart',
+
     # my apps
     'menu',
+
 ]
 
 MIDDLEWARE = [
@@ -66,11 +70,13 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cart.context_processor.cart_total_amount',
             ],
         },
     },
 ]
 
+CART_SESSION_ID = 'cart'
 WSGI_APPLICATION = 'burger_king.wsgi.application'
 
 # Database
@@ -127,6 +133,7 @@ STATICFILES_DIRS = (
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

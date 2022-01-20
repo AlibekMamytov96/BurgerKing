@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %} Products {% endblock %}
 {% block content %}
 
@@ -10,9 +11,14 @@
                     <h3 class="card-title">
                         <a href="{% url 'detail' product.id %}">{{ product.name }}</a>
                     </h3>
-                    <p class="card-text">{{ product.cal }} Cal.</p>
+                    <p class="card-text">{{ product.price }}$</p>
+                    <a href="{% url 'cart_add' product.id %}">
+                        <img style="width: 30px; height: auto;" src="{% static 'shopping-cart.png' %}">
+                    </a>
                 </div>
             </div>
 
+
     {% endfor %}
+    </div>
 {% endblock %}
