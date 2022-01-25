@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Results {% endblock %}
+{% block content %}
+
+<div class="card-group">
+{% if not results %}
+<h1>По запросу "{{ search_word }}" ничего не найдено</h1>
+{% else %}
+    <div style="display: flex; flex-wrap: wrap;">
+{% for product in results %}
+
+    <div style="background-color: #f5ebdc; display: flex; justify-content: center; align-items: center; border: none;"  class="card text-center">
+        <img style="width: 320px; height: auto;" src="{{ product.image.url }}" class="card-img-top" alt="...">
+        <div class="card-body">
+            <h3 class="card-title">
+                <a href="{% url 'detail' product.id %}">{{ product.name }}</a>
+            </h3>
+            <p class="card-text">{{ product.price }}$</p>
+            {% if product.status == 'in stock' %}
+            <a href="{% url 'cart_add' product.id %}">
+                <img style="width: 30px; height: auto;" src="{% static 'shopping-cart.png' %}">
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+
+
+{% endfor %}
+    </div>
+{% endif %}
+</div>
+
+{% endblock %}

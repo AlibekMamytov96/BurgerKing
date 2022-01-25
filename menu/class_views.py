@@ -1,9 +1,36 @@
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import ListView, DeleteView, CreateView, UpdateView
+from django.views.generic import ListView, DeleteView, CreateView, UpdateView, DetailView
+from .permissions import IsAdminCheckMixin
 
 from .forms import *
 from .models import *
+
+
+class SearchListView(ListView):
+    model = Product
+    # Product.objects.all()
+    template_name = 'search.html'
+    context_object_name = 'results'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(SearchListView, self).get_context_data()
+        context['search_word'] = self.request.GET.get('q')
+        return context
+
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search_word = self.request.GET.get('q')
+        queryset = queryset.filter(name__icontains=search_word)
+        if not search_word:
+            queryset = Product.objects.none()
+        else:
+            if len(search_word) < 3:
+                queryset = Product.objects.none()
+            else:
+                queryset = queryset.filter(name__icontains=search_word)
+        return queryset
 
 
 class CategoryListView(ListView):
@@ -18,12 +45,16 @@ class ProductListView(ListView):
     # Product.objects.all()
     template_name = 'list.html'
     context_object_name = 'products'
-    paginate_by = 1
+    paginate_by = 3
 
     def get_queryset(self):
         queryset = super().get_queryset()  # all products
         slug = self.kwargs.get('slug')
-        queryset = queryset.filter(category__slug=slug)
+        filter_word = self.request.GET.get('filter')
+        if filter_word:
+            queryset = queryset.filter(category__slug=slug, status=filter_word)
+        else:
+            queryset = queryset.filter(category__slug=slug)
         return queryset
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -33,7 +64,7 @@ class ProductListView(ListView):
         return context
 
 
-class ProductDetailView(DeleteView):
+class ProductDetailView(DetailView):
     model = Product
     # Product.objects.get()
     template_name = 'detail.html'
@@ -41,7 +72,7 @@ class ProductDetailView(DeleteView):
     pk_url_kwarg = 'product_id'
 
 
-class ProductCreateView(CreateView):
+class ProductCreateView(IsAdminCheckMixin, CreateView):
     model = Product
     # Product.objects.create()
     template_name = 'create_product.html'
@@ -58,7 +89,7 @@ class ProductCreateView(CreateView):
         return context
 
 
-class ProductUpdateView(UpdateView):
+class ProductUpdateView(IsAdminCheckMixin, UpdateView):
     model = Product
     # Product.objects.get().update()
     template_name = 'update_product.html'
@@ -70,7 +101,8 @@ class ProductUpdateView(UpdateView):
         context['product_form'] = self.get_form()
         return context
 
-class ProductDeleteView(DeleteView):
+
+class ProductDeleteView(IsAdminCheckMixin, DeleteView):
     model = Product
     # Product.objects.get().delete()
     template_name = 'delete_product.html'
