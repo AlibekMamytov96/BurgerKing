@@ -2,6 +2,7 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import ListView, DeleteView, CreateView, UpdateView, DetailView
 from .permissions import IsAdminCheckMixin
+from cart.cart import Cart
 
 from .forms import *
 from .models import *
@@ -17,7 +18,6 @@ class SearchListView(ListView):
         context = super(SearchListView, self).get_context_data()
         context['search_word'] = self.request.GET.get('q')
         return context
-
 
     def get_queryset(self):
         queryset = super().get_queryset()
